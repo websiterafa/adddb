@@ -6,103 +6,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --input: #334155;
-      --btn: #38bdf8;
-      --btn-hover: #0ea5e9;
-      --text: #f8fafc;
-      --muted: #e2e8f0;
+      --bg: #0a0f1c;
+      --card: #131b2d;
+      --input: #1f2937;
+      --btn: #00d4ff;
+      --btn-hover: #00b3e6;
+      --text: #ffffff;
+      --muted: #9ca3af;
+      --red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
+      background: linear-gradient(to bottom, #0a0f1c, #0f172a);
       color: var(--text);
       display: flex;
       justify-content: center;
       padding: 20px;
+      min-height: 100vh;
+      animation: fadeIn 1s ease;
     }
 
     .container {
       background: var(--card);
-      padding: 20px;
-      border-radius: 10px;
+      padding: 24px;
+      border-radius: 12px;
       width: 100%;
-      max-width: 450px;
-      position: relative;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      max-width: 500px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
     }
 
     h2 {
       text-align: center;
       color: var(--btn);
-      margin-bottom: 16px;
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px var(--btn);
     }
 
     input, button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 10px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
     }
 
-    input { background: var(--input); color: white; }
+    input {
+      background: var(--input);
+      color: white;
+    }
+
     button {
       background: var(--btn);
       color: black;
       font-weight: bold;
       cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 10px var(--btn);
     }
 
-    button:hover { background: var(--btn-hover); }
-
-    .login {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .list {
-      margin-top: 10px;
-    }
-
-    .item {
-      background: var(--input);
-      margin-bottom: 6px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      font-size: 14px;
-    }
-
-    .item button {
-      background: red;
-      color: white;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      border: none;
-      border-radius: 4px;
-      padding: 0;
-      cursor: pointer;
-    }
-
-    #output {
-      font-size: 14px;
-      margin-top: 12px;
-      color: var(--muted);
-      white-space: pre-wrap;
+    button:hover {
+      background: var(--btn-hover);
+      box-shadow: 0 0 15px var(--btn);
     }
 
     .button-group {
       display: flex;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 12px;
+    }
+
+    .list {
+      margin-top: 16px;
+    }
+
+    .item {
+      background: var(--input);
+      margin-bottom: 8px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+
+    .item button {
+      background: var(--red);
+      color: white;
+      width: 26px;
+      height: 26px;
+      font-size: 14px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .item button:hover {
+      background: #dc2626;
+    }
+
+    #output {
+      font-size: 14px;
+      margin-top: 14px;
+      color: var(--muted);
+      white-space: pre-wrap;
     }
 
     .loading {
@@ -112,8 +129,8 @@
     }
 
     .spinner {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border: 4px solid var(--input);
       border-top: 4px solid var(--btn);
       border-radius: 50%;
@@ -123,45 +140,29 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Admin Panel DBV1</h2>
+    <h2>⚙️ Admin Panel DBV1</h2>
 
-    <div id="login-form" class="login">
-      <input type="text" id="username" placeholder="Username admin">
-      <input type="password" id="password" placeholder="Password admin">
-      <button onclick="login()">🔐 Masuk</button>
+    <input type="text" id="nomor" placeholder="Masukkan nomor 62xxxxxxxxxx">
+    <div class="button-group">
+      <button onclick="submitNomor()">➕ Tambah</button>
+      <button onclick="loadNomor()">📄 Refresh</button>
     </div>
-
-    <div id="admin-panel" style="display:none">
-      <input type="text" id="nomor" placeholder="Masukkan nomor 62xxxxxxx">
-      <div class="button-group">
-        <button onclick="submitNomor()">➕ Tambah</button>
-        <button onclick="loadNomor()">📄 Lihat Semua</button>
-      </div>
-      <div class="loading" id="loading"><div class="spinner"></div></div>
-      <pre id="output">Status akan muncul di sini...</pre>
-      <div class="list" id="list"></div>
-    </div>
+    <div class="loading" id="loading"><div class="spinner"></div></div>
+    <pre id="output">Status akan muncul di sini...</pre>
+    <div class="list" id="list"></div>
   </div>
 
   <script>
-    const adminUser = "admin";
-    const adminPass = "dbv1pass";
-
-    function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
-
-      if (user === adminUser && pass === adminPass) {
-        document.getElementById("login-form").style.display = "none";
-        document.getElementById("admin-panel").style.display = "block";
-      } else {
-        alert("❌ Username atau password salah!");
-      }
-    }
+    window.onload = loadNomor;
 
     function showLoading(show) {
       document.getElementById("loading").style.display = show ? "flex" : "none";
@@ -174,7 +175,6 @@
       if (nomor.startsWith("08")) nomor = "62" + nomor.slice(1);
       else if (nomor.startsWith("8")) nomor = "62" + nomor;
       else if (!nomor.startsWith("62")) return out.textContent = "❌ Nomor harus dimulai dari 62";
-
       if (!/^62\d{8,}$/.test(nomor)) return out.textContent = "❌ Format nomor tidak valid.";
 
       try {
@@ -219,7 +219,7 @@
           div.className = "item";
           div.innerHTML = `
             <span>${i + 1}. ${nomor}</span>
-            <button onclick="hapusNomor('${nomor}')">✖</button>
+            <button onclick="hapusNomor('${nomor}')">×</button>
           `;
           list.appendChild(div);
         });
