@@ -15,6 +15,10 @@
       --muted: #e2e8f0;
     }
 
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -22,16 +26,18 @@
       color: var(--text);
       display: flex;
       justify-content: center;
+      align-items: center;
+      min-height: 100vh;
       padding: 20px;
     }
 
     .container {
       background: var(--card);
       padding: 24px;
-      border-radius: 12px;
+      border-radius: 14px;
       width: 100%;
       max-width: 480px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
       animation: fadeIn 0.5s ease-in-out;
     }
 
@@ -39,7 +45,7 @@
       text-align: center;
       color: var(--btn);
       margin-bottom: 20px;
-      font-size: 24px;
+      font-size: 26px;
     }
 
     input, button {
@@ -47,8 +53,9 @@
       padding: 12px;
       margin-top: 10px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
+      transition: all 0.3s ease;
     }
 
     input {
@@ -56,62 +63,32 @@
       color: white;
     }
 
+    input::placeholder {
+      color: #94a3b8;
+    }
+
     button {
       background: var(--btn);
       color: black;
-      font-weight: bold;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
     button:hover {
       background: var(--btn-hover);
-    }
-
-    .list {
-      margin-top: 16px;
-    }
-
-    .item {
-      background: var(--input);
-      margin-bottom: 8px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 15px;
-    }
-
-    .item button {
-      background: red;
-      color: white;
-      width: 22px;
-      height: 22px;
-      font-size: 12px;
-      border: none;
-      border-radius: 4px;
-      padding: 0;
-      cursor: pointer;
-    }
-
-    #output {
-      font-size: 14px;
-      margin-top: 14px;
-      color: var(--muted);
-      white-space: pre-wrap;
+      transform: scale(1.02);
     }
 
     .button-group {
       display: flex;
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 14px;
     }
 
     .loading {
       display: none;
       justify-content: center;
-      margin-top: 10px;
+      margin-top: 14px;
     }
 
     .spinner {
@@ -121,6 +98,39 @@
       border-top: 4px solid var(--btn);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
+    }
+
+    #output {
+      font-size: 14px;
+      margin-top: 16px;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .list {
+      margin-top: 16px;
+    }
+
+    .item {
+      background: var(--input);
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+    }
+
+    .item button {
+      background: red;
+      color: white;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     @keyframes spin {
@@ -142,6 +152,7 @@
       <button onclick="submitNomor()">➕ Tambah</button>
       <button onclick="loadNomor()">📄 Lihat Semua</button>
     </div>
+
     <div class="loading" id="loading"><div class="spinner"></div></div>
     <pre id="output">Status akan muncul di sini...</pre>
     <div class="list" id="list"></div>
@@ -191,7 +202,7 @@
       showLoading(true);
 
       try {
-        const res = await fetch("/api/dbv1");
+        const res = await fetch("/api/dbv1?" + Date.now()); // biar gak cache
         const data = await res.json();
         if (!Array.isArray(data.dbny)) {
           out.textContent = "❌ Format database salah.";
