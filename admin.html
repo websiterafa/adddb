@@ -13,10 +13,7 @@
       --btn-hover: #0ea5e9;
       --text: #f8fafc;
       --muted: #e2e8f0;
-    }
-
-    * {
-      box-sizing: border-box;
+      --danger: #ef4444;
     }
 
     body {
@@ -26,36 +23,33 @@
       color: var(--text);
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 24px;
     }
 
     .container {
       background: var(--card);
       padding: 24px;
-      border-radius: 14px;
+      border-radius: 16px;
       width: 100%;
-      max-width: 480px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-      animation: fadeIn 0.5s ease-in-out;
+      max-width: 500px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      animation: fadeIn 0.4s ease-in-out;
     }
 
     h2 {
       text-align: center;
       color: var(--btn);
-      margin-bottom: 20px;
       font-size: 26px;
+      margin-bottom: 20px;
     }
 
     input, button {
       width: 100%;
       padding: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 16px;
-      transition: all 0.3s ease;
     }
 
     input {
@@ -63,26 +57,22 @@
       color: white;
     }
 
-    input::placeholder {
-      color: #94a3b8;
-    }
-
     button {
       background: var(--btn);
       color: black;
-      font-weight: 600;
+      font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
 
     button:hover {
       background: var(--btn-hover);
-      transform: scale(1.02);
     }
 
     .button-group {
       display: flex;
       gap: 10px;
-      margin-top: 14px;
+      margin-top: 12px;
     }
 
     .loading {
@@ -92,8 +82,8 @@
     }
 
     .spinner {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border: 4px solid var(--input);
       border-top: 4px solid var(--btn);
       border-radius: 50%;
@@ -102,7 +92,7 @@
 
     #output {
       font-size: 14px;
-      margin-top: 16px;
+      margin-top: 14px;
       color: var(--muted);
       white-space: pre-wrap;
     }
@@ -113,24 +103,30 @@
 
     .item {
       background: var(--input);
-      margin-bottom: 10px;
-      padding: 10px 14px;
+      margin-bottom: 8px;
+      padding: 8px 12px;
       border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 15px;
+      animation: fadeIn 0.2s ease-in-out;
     }
 
     .item button {
-      background: red;
+      background: var(--danger);
       color: white;
-      width: 24px;
-      height: 24px;
-      font-size: 14px;
+      font-size: 13px;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
       cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .item button:hover {
+      transform: scale(1.1);
     }
 
     @keyframes spin {
@@ -138,7 +134,7 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
@@ -146,21 +142,53 @@
 <body>
   <div class="container">
     <h2>🛠️ Admin Panel DBV1</h2>
-
     <input type="text" id="nomor" placeholder="Masukkan nomor 62xxxxxxxxxx">
     <div class="button-group">
       <button onclick="submitNomor()">➕ Tambah</button>
       <button onclick="loadNomor()">📄 Lihat Semua</button>
     </div>
-
     <div class="loading" id="loading"><div class="spinner"></div></div>
     <pre id="output">Status akan muncul di sini...</pre>
     <div class="list" id="list"></div>
   </div>
 
   <script>
+    const GITHUB_JSON_URL = "https://raw.githubusercontent.com/websiterafa/Dbv10/refs/heads/main/dbv10.json";
+
     function showLoading(show) {
       document.getElementById("loading").style.display = show ? "flex" : "none";
+    }
+
+    async function loadNomor() {
+      const list = document.getElementById("list");
+      const out = document.getElementById("output");
+      list.innerHTML = "";
+      showLoading(true);
+
+      try {
+        const res = await fetch(GITHUB_JSON_URL);
+        const data = await res.json();
+
+        if (!Array.isArray(data.dbny)) {
+          out.textContent = "❌ Format database salah.";
+          return;
+        }
+
+        out.textContent = `📦 Total ${data.dbny.length} nomor`;
+        data.dbny.forEach((nomor, i) => {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <span>${i + 1}. ${nomor}</span>
+            <button onclick="hapusNomor('${nomor}')">✖</button>
+          `;
+          list.appendChild(div);
+        });
+      } catch (err) {
+        out.textContent = "❌ Gagal ambil data.\n" + err.message;
+      } finally {
+        showLoading(false);
+      }
     }
 
     async function submitNomor() {
@@ -184,43 +212,12 @@
         if (res.status === 409) out.textContent = "⚠️ Nomor sudah ada.";
         else if (res.ok) {
           out.textContent = "✅ Nomor berhasil ditambahkan.";
-          loadNomor();
+          await loadNomor();
         } else {
           out.textContent = "❌ Gagal tambah: " + (data.message || "Tidak diketahui");
         }
       } catch (err) {
         out.textContent = "❌ Error: " + err.message;
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    async function loadNomor() {
-      const list = document.getElementById("list");
-      const out = document.getElementById("output");
-      list.innerHTML = "";
-      showLoading(true);
-
-      try {
-        const res = await fetch("/api/dbv1?" + Date.now()); // biar gak cache
-        const data = await res.json();
-        if (!Array.isArray(data.dbny)) {
-          out.textContent = "❌ Format database salah.";
-          return;
-        }
-
-        out.textContent = `📦 Total ${data.dbny.length} nomor`;
-        data.dbny.forEach((nomor, i) => {
-          const div = document.createElement("div");
-          div.className = "item";
-          div.innerHTML = `
-            <span>${i + 1}. ${nomor}</span>
-            <button onclick="hapusNomor('${nomor}')">✖</button>
-          `;
-          list.appendChild(div);
-        });
-      } catch (err) {
-        out.textContent = "❌ Gagal ambil data.\n" + err.message;
       } finally {
         showLoading(false);
       }
@@ -240,7 +237,7 @@
         const data = await res.json();
         if (res.ok) {
           out.textContent = "✅ Nomor berhasil dihapus.";
-          loadNomor();
+          await loadNomor();
         } else {
           out.textContent = "❌ Gagal hapus: " + data.message;
         }
@@ -250,6 +247,8 @@
         showLoading(false);
       }
     }
+
+    window.addEventListener("load", loadNomor);
   </script>
 </body>
 </html>
