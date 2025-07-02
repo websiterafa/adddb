@@ -29,24 +29,24 @@
     .container {
       background: var(--card);
       padding: 24px;
-      border-radius: 16px;
+      border-radius: 12px;
       width: 100%;
-      max-width: 500px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.4);
-      animation: fadeIn 0.4s ease-in-out;
+      max-width: 480px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      animation: fadeIn 0.5s ease-in-out;
     }
 
     h2 {
       text-align: center;
       color: var(--btn);
-      font-size: 26px;
       margin-bottom: 20px;
+      font-size: 24px;
     }
 
     input, button {
       width: 100%;
       padding: 12px;
-      margin-top: 12px;
+      margin-top: 10px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
@@ -69,25 +69,31 @@
       background: var(--btn-hover);
     }
 
-    .button-group {
+    .list {
+      margin-top: 16px;
+    }
+
+    .item {
+      background: var(--input);
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
       display: flex;
-      gap: 10px;
-      margin-top: 12px;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
     }
 
-    .loading {
-      display: none;
-      justify-content: center;
-      margin-top: 14px;
-    }
-
-    .spinner {
-      width: 28px;
-      height: 28px;
-      border: 4px solid var(--input);
-      border-top: 4px solid var(--btn);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    .item .delete-btn {
+      background: var(--danger);
+      border: none;
+      color: white;
+      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
     }
 
     #output {
@@ -97,36 +103,25 @@
       white-space: pre-wrap;
     }
 
-    .list {
-      margin-top: 16px;
-    }
-
-    .item {
-      background: var(--input);
-      margin-bottom: 8px;
-      padding: 8px 12px;
-      border-radius: 8px;
+    .button-group {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 15px;
-      animation: fadeIn 0.2s ease-in-out;
+      gap: 10px;
+      margin-top: 12px;
     }
 
-    .item button {
-      background: var(--danger);
-      color: white;
-      font-size: 13px;
-      border: none;
-      border-radius: 6px;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
+    .loading {
+      display: none;
+      justify-content: center;
+      margin-top: 10px;
     }
 
-    .item button:hover {
-      transform: scale(1.1);
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 4px solid var(--input);
+      border-top: 4px solid var(--btn);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
 
     @keyframes spin {
@@ -134,7 +129,7 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
@@ -145,7 +140,7 @@
     <input type="text" id="nomor" placeholder="Masukkan nomor 62xxxxxxxxxx">
     <div class="button-group">
       <button onclick="submitNomor()">➕ Tambah</button>
-      <button onclick="loadNomor()">📄 Lihat Semua</button>
+      <button onclick="loadNomor()">🔄 Refresh</button>
     </div>
     <div class="loading" id="loading"><div class="spinner"></div></div>
     <pre id="output">Status akan muncul di sini...</pre>
@@ -153,7 +148,7 @@
   </div>
 
   <script>
-    const GITHUB_JSON_URL = "https://raw.githubusercontent.com/websiterafa/Dbv10/refs/heads/main/dbv10.json";
+    const RAW_URL = "https://raw.githubusercontent.com/websiterafa/Dbv10/refs/heads/main/dbv10.json";
 
     function showLoading(show) {
       document.getElementById("loading").style.display = show ? "flex" : "none";
@@ -164,23 +159,20 @@
       const out = document.getElementById("output");
       list.innerHTML = "";
       showLoading(true);
-
       try {
-        const res = await fetch(GITHUB_JSON_URL);
+        const res = await fetch(RAW_URL);
         const data = await res.json();
-
         if (!Array.isArray(data.dbny)) {
           out.textContent = "❌ Format database salah.";
           return;
         }
-
         out.textContent = `📦 Total ${data.dbny.length} nomor`;
         data.dbny.forEach((nomor, i) => {
           const div = document.createElement("div");
           div.className = "item";
           div.innerHTML = `
             <span>${i + 1}. ${nomor}</span>
-            <button onclick="hapusNomor('${nomor}')">✖</button>
+            <button class="delete-btn" onclick="hapusNomor('${nomor}')">×</button>
           `;
           list.appendChild(div);
         });
@@ -209,10 +201,12 @@
           body: JSON.stringify({ number: nomor })
         });
         const data = await res.json();
-        if (res.status === 409) out.textContent = "⚠️ Nomor sudah ada.";
-        else if (res.ok) {
+        if (res.status === 409) {
+          out.textContent = "⚠️ Nomor sudah ada.";
+        } else if (res.ok) {
           out.textContent = "✅ Nomor berhasil ditambahkan.";
-          await loadNomor();
+          document.getElementById("nomor").value = "";
+          loadNomor();
         } else {
           out.textContent = "❌ Gagal tambah: " + (data.message || "Tidak diketahui");
         }
@@ -237,7 +231,7 @@
         const data = await res.json();
         if (res.ok) {
           out.textContent = "✅ Nomor berhasil dihapus.";
-          await loadNomor();
+          loadNomor();
         } else {
           out.textContent = "❌ Gagal hapus: " + data.message;
         }
@@ -248,7 +242,8 @@
       }
     }
 
-    window.addEventListener("load", loadNomor);
+    // Muat data saat pertama kali dibuka
+    window.onload = loadNomor;
   </script>
 </body>
 </html>
