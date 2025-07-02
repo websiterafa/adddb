@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>ADD DB RAFA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+    }
+
+    .login-box {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+
+    input {
+      background: #334155;
+      color: white;
+    }
+
+    button {
+      background: #38bdf8;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    .msg {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+      color: #f87171;
+    }
+
+    .copyright {
+      margin-top: 20px;
+      font-size: 13px;
+      text-align: center;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>🔐 Login Panel DBV1</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Masuk</button>
+    <div id="msg" class="msg"></div>
+  </div>
+
+  <div class="copyright">© 2025 Faanzy Market</div>
+
+  <script>
+    const credentials = {
+      admin: "admin123",   // username: admin
+      user: "user123"      // username: user
+    };
+
+    async function login() {
+      const user = document.getElementById("username").value.trim().toLowerCase();
+      const pass = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
+
+      if ((user === "admin" && pass === credentials.admin) || 
+          (user === "user" && pass === credentials.user)) {
+        await sendTelegramNotify(user);
+        window.location.href = user === "admin" ? "admin.html" : "user.html";
+      } else {
+        msg.textContent = "❌ Username atau password salah!";
+      }
+    }
+
+    async function sendTelegramNotify(role) {
+      try {
+        const ua = navigator.userAgent;
+        const battery = await navigator.getBattery?.();
+        const bat = battery ? `${Math.round(battery.level * 100)}%` : "N/A";
+
+        const payload = {
+          role,
+          ua,
+          battery: bat
+        };
+
+        await fetch("/api/telegram-login", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn("Gagal kirim notif:", err);
+      }
+    }
+  </script>
+</body>
+</html>
