@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const rawUrl = "https://raw.githubusercontent.com/websiterafa/Dbv10/refs/heads/main/dbv10.json";
+  const rawUrl = "https://raw.githubusercontent.com/databasescript/databasev10/refs/heads/main/databasev10";
 
   try {
     const response = await fetch(rawUrl);
