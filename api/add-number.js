@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   const { number } = req.body;
   if (!number) return res.status(400).json({ message: "Nomor kosong" });
 
-  const repo = "databasev10/refs";
+  const repo = "databasescript/databasev10";
   const filename = "databasev10";
   const token = process.env.GITHUB_TOKEN;
 
