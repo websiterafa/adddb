@@ -4,8 +4,8 @@ export default async function handler(req, res) {
   const { number } = req.body;
   if (!number || !/^62\d{8,}$/.test(number)) return res.status(400).json({ message: "Nomor tidak valid" });
 
-  const repo = "websiterafa/Dbv10";
-  const filename = "dbv10.json";
+  const repo = "databasev10/refs";
+  const filename = "databasev10";
   const token = process.env.GITHUB_TOKEN;
 
   try {
