@@ -7,8 +7,8 @@ export default async function handler(req, res) {
   const { number } = req.body;
   if (!number) return res.status(400).json({ message: "Nomor kosong" });
 
-  const repo = "websiterafa/Dbv10";
-  const filename = "dbv10.json";
+  const repo = "databasev10/refs";
+  const filename = "databasev10";
   const token = process.env.GITHUB_TOKEN;
 
   const getFile = await fetch(`https://api.github.com/repos/${repo}/contents/${filename}`, {
